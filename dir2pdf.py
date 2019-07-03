@@ -2,8 +2,12 @@
 """
 Convert the images in a directory to a PDF.
 """
-import os, sys
+import os
+import re
+import sys
+import warnings
 
+from argparse import ArgumentParser, ArgumentTypeError
 from pathlib import Path
 
 from PIL import Image
@@ -15,7 +19,7 @@ def exit(*message, code=1):
         print('error:', *message, file=sys.stderr)
     sys.exit(code)
 
-def dir2pdf(dir_path, pdf_path, title, author):
+def dir2pdf(dir_path, pdf_path, title=None, author=None):
     """Convert the files in the given directory into a PDF
     """
     files = sorted(dir_path.iterdir())
@@ -32,24 +36,86 @@ def dir2pdf(dir_path, pdf_path, title, author):
         with Image.open(file) as im:
             im.save(pdf_path, format='PDF', append=True)
 
+def subdirs2pdf(basedir_path, pdf_path, subdir_regex,
+                title=None, author=None, append=False):
+    for subdir in sorted(basedir_path.iterdir()):
+        match = subdir_regex.match(subdir.name)
+
+        if not match:
+            warnings.warn(f'skipping subdir {subdir}:'
+                          ' did not match subdir regex')
+            continue
+
+        if 'n' in match.groupdict():
+            n = match.group('n')
+        elif match.groups():
+            n = match.group(1)
+        else:
+            n = match.group(0)
+
+        pdf = Path(str(pdf_path).format(n))
+
+        if pdf.exists():
+            warnings.warn(f'skipping file {pdf}: file already exists')
+            continue
+
+        dir2pdf(subdir, pdf, title, author)
+
+
+def argparser():
+    epilog = re.sub(r'\s+', ' ', '''
+    If --subdirs is given, A PDF is then generated for each subdirectory. The
+    given PDF name is used as a format string, with {} substituted by the named
+    group 'n', if present, or the first capturing group otherwise. If there are
+    no capturing group, the entire match string is used in the name of the
+    PDF. Errors may occur if the format field contains special filename
+    characters.''')
+
+    parser = ArgumentParser(
+        description='Convert images from a directory into a PDF',
+        epilog=epilog)
+
+    parser.add_argument('dir', type=Path, help='The directory to convert')
+    parser.add_argument('pdf', type=Path, help='The PDF to write')
+    parser.add_argument('--title', '-t', help='A title for the PDF')
+    parser.add_argument('--author', '-a', help='The author of the document')
+
+    parser.add_argument('--subdirs', '-d', type=Regex, help=(
+        "A regexp matching the base name of each subdirectory."))
+
+    return parser
+
+def Regex(arg):
+    """Argument type for --subdirs regular expressions"""
+    try:
+        regex = re.compile(arg)
+    except re.error as e:
+        raise ArgumentTypeError(e.msg)
+    if 'n' not in regex.groupindex and regex.groups < 1:
+        raise ArgumentTypeError(
+            "--subdirs regex must have at least one capturing group")
+    return regex
 
 if __name__ == '__main__':
     # args are directory, pdf, title, and author
-    if len(sys.argv) != 5:
-        print('usage: dir2pdf DIR PDF TITLE AUTHOR', file=sys.stderr)
-        exit(1)
+    parser = argparser()
+    args = parser.parse_args()
 
-    dir_path, pdf_path = Path(sys.argv[1]), Path(sys.argv[2])
-    title, author = sys.argv[3:]
-
-    if not dir_path.is_dir():
-        exit(f'{dir_path} is not a directory')
+    if not args.dir.is_dir():
+        exit(f'{args.dir} is not a directory')
     try:
-        next(dir_path.iterdir())
+        next(args.dir.iterdir())
     except StopIteration:
-        exit(f'no files in {dir_path}')
+        exit(f'no files in {args.dir}')
 
-    if pdf_path.exists():
-        exit(f'{pdf_path} already exists')
+    if args.subdirs is not None:
+        if '{}' not in str(args.pdf):
+            parser.error(
+                'if --subdirs is given, PDF must contain format field {}')
+    elif args.pdf.exists():
+        exit(f'{args.pdf} already exists')
 
-    dir2pdf(dir_path, pdf_path, title, author)
+    if args.subdirs is None:
+        dir2pdf(args.dir, args.pdf, args.title, args.author)
+    else:
+        subdirs2pdf(args.dir, args.pdf, args.subdirs, args.title, args.author)
