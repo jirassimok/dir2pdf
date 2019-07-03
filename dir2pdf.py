@@ -19,7 +19,7 @@ def exit(*message, code=1):
         print('error:', *message, file=sys.stderr)
     sys.exit(code)
 
-def dir2pdf(dir_path, pdf_path, title=None, author=None):
+def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
     """Convert the files in the given directory into a PDF
     """
     files = sorted(dir_path.iterdir())
@@ -30,7 +30,8 @@ def dir2pdf(dir_path, pdf_path, title=None, author=None):
                 format='PDF',
                 title=title,
                 author=author,
-                producer='dir2pdf')
+                producer='dir2pdf',
+                append=append)
 
     for file in files[1:]:
         with Image.open(file) as im:
@@ -55,11 +56,11 @@ def subdirs2pdf(basedir_path, pdf_path, subdir_regex,
 
         pdf = Path(str(pdf_path).format(n))
 
-        if pdf.exists():
+        if not append and pdf.exists():
             warnings.warn(f'skipping file {pdf}: file already exists')
             continue
 
-        dir2pdf(subdir, pdf, title, author)
+        dir2pdf(subdir, pdf, title, author, append)
 
 
 def argparser():
@@ -78,7 +79,10 @@ def argparser():
     parser.add_argument('dir', type=Path, help='The directory to convert')
     parser.add_argument('pdf', type=Path, help='The PDF to write')
     parser.add_argument('--title', '-t', help='A title for the PDF')
-    parser.add_argument('--author', '-a', help='The author of the document')
+    parser.add_argument('--author', help='The author of the document')
+
+    parser.add_argument('--append', help='Append to the PDF instead of writing',
+                        action='store_const', const=True, default=False)
 
     parser.add_argument('--subdirs', '-d', type=Regex, help=(
         "A regexp matching the base name of each subdirectory."))
@@ -112,10 +116,11 @@ if __name__ == '__main__':
         if '{}' not in str(args.pdf):
             parser.error(
                 'if --subdirs is given, PDF must contain format field {}')
-    elif args.pdf.exists():
+    elif not args.append and args.pdf.exists():
         exit(f'{args.pdf} already exists')
 
     if args.subdirs is None:
-        dir2pdf(args.dir, args.pdf, args.title, args.author)
+        dir2pdf(args.dir, args.pdf, args.title, args.author, args.append)
     else:
-        subdirs2pdf(args.dir, args.pdf, args.subdirs, args.title, args.author)
+        subdirs2pdf(args.dir, args.pdf, args.subdirs,
+                    args.title, args.author, args.append)
