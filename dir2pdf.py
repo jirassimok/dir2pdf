@@ -76,8 +76,8 @@ def argparser():
         description='Convert images from a directory into a PDF',
         epilog=epilog)
 
-    parser.add_argument('dir', type=Path, help='The directory to convert')
     parser.add_argument('pdf', type=Path, help='The PDF to write')
+    parser.add_argument('dir', type=Path, help='The directory to convert')
     parser.add_argument('--title', '-t', help='A title for the PDF')
     parser.add_argument('--author', help='The author of the document')
 
