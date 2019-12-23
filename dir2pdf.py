@@ -64,17 +64,15 @@ def subdirs2pdf(basedir_path, pdf_path, subdir_regex,
 
 
 def argparser():
-    epilog = re.sub(r'\s+', ' ', '''
-    If --subdirs is given, A PDF is then generated for each subdirectory. The
-    given PDF name is used as a format string, with {} substituted by the named
-    group 'n', if present, or the first capturing group otherwise. If there are
-    no capturing group, the entire match string is used in the name of the
-    PDF. Errors may occur if the format field contains special filename
-    characters.''')
-
     parser = ArgumentParser(
         description='Convert images from a directory into a PDF',
-        epilog=epilog)
+        epilog='''
+        If --subdirs is given, A PDF is then generated for each subdirectory.
+        The given PDF name is used as a format string, with {} substituted by
+        the named group 'n', if present, or the first capturing group
+        otherwise. If there are no capturing group, the entire match string is
+        used in the name of the PDF. Errors may occur if the format field
+        contains special filename characters.''')
 
     parser.add_argument('pdf', type=Path, help='The PDF to write')
     parser.add_argument('dir', type=Path, help='The directory to convert')
