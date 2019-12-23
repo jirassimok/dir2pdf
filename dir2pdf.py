@@ -12,12 +12,14 @@ from pathlib import Path
 
 from PIL import Image
 
+
 def exit(*message, code=1):
     """Print an optional error message and exit with the given status
     """
     if message:
         print('error:', *message, file=sys.stderr)
     sys.exit(code)
+
 
 def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
     """Convert the files in the given directory into a PDF
@@ -36,6 +38,7 @@ def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
     for file in files[1:]:
         with Image.open(file) as im:
             im.save(pdf_path, format='PDF', append=True)
+
 
 def subdirs2pdf(basedir_path, pdf_path, subdir_regex,
                 title=None, author=None, append=False):
@@ -87,6 +90,7 @@ def argparser():
 
     return parser
 
+
 def Regex(arg):
     """Argument type for --subdirs regular expressions"""
     try:
@@ -97,6 +101,7 @@ def Regex(arg):
         raise ArgumentTypeError(
             "--subdirs regex must have at least one capturing group")
     return regex
+
 
 if __name__ == '__main__':
     # args are directory, pdf, title, and author
