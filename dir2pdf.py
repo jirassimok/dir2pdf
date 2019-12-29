@@ -13,14 +13,6 @@ from pathlib import Path
 from PIL import Image
 
 
-def exit(*message, code=1):
-    """Print an optional error message and exit with the given status
-    """
-    if message:
-        print('error:', *message, file=sys.stderr)
-    sys.exit(code)
-
-
 def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
     """Convert the files in the given directory into a PDF
     """
@@ -121,18 +113,18 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if not args.dir.is_dir():
-        exit(f'{args.dir} is not a directory')
+        sys.exit(f'{args.dir} is not a directory')
     try:
         next(args.dir.iterdir())
     except StopIteration:
-        exit(f'no files in {args.dir}')
+        sys.exit(f'no files in {args.dir}')
 
     if args.subdirs is not None:
         if '{}' not in str(args.pdf):
             parser.error(
                 'if --subdirs is given, PDF must contain format field {}')
     elif not args.append and args.pdf.exists():
-        exit(f'{args.pdf} already exists')
+        sys.exit(f'{args.pdf} already exists')
 
     if args.subdirs is None:
         dir2pdf(args.dir, args.pdf, args.title, args.author, args.append)
