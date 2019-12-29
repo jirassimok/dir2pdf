@@ -28,6 +28,7 @@ def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
 
     # Save the title page with metadata
     with Image.open(files[0]) as im:
+        im = remove_transparency(im, files[0])
         im.save(pdf_path,
                 format='PDF',
                 title=title,
@@ -37,7 +38,18 @@ def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
 
     for file in files[1:]:
         with Image.open(file) as im:
+            im = remove_transparency(im, file)
             im.save(pdf_path, format='PDF', append=True)
+
+
+def remove_transparency(image, filename):
+    if image.mode == 'RGBA':
+        if image.getchannel('A').getextrema() != (255, 255):
+            warnings.warn(f"Image '{filename}' contains transparency;"
+                          " color will be off")
+        return image.convert('RGB')
+    else:
+        return image
 
 
 def subdirs2pdf(basedir_path, pdf_path, subdir_regex,
