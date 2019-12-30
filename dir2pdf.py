@@ -99,15 +99,11 @@ def argparser():
 
 
 def Regex(arg):
-    """Argument type for --subdirs regular expressions"""
+    """Argparser argument type for regular expressions"""
     try:
-        regex = re.compile(arg)
+        return re.compile(arg)
     except re.error as e:
         raise ArgumentTypeError(e.msg)
-    if 'n' not in regex.groupindex and regex.groups < 1:
-        raise ArgumentTypeError(
-            "--subdirs regex must have at least one capturing group")
-    return regex
 
 
 if __name__ == '__main__':
