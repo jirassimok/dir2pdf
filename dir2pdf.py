@@ -118,7 +118,7 @@ def Regex(arg):
         raise ArgumentTypeError(e.msg)
 
 
-if __name__ == '__main__':
+def main():
     # args are directory, pdf, title, and author
     parser = argparser()
     args = parser.parse_args()
@@ -142,3 +142,7 @@ if __name__ == '__main__':
     else:
         subdirs2pdf(args.dir, args.pdf, args.subdirs,
                     args.title, args.author, args.append)
+
+
+if __name__ == '__main__':
+    main()

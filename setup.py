@@ -12,6 +12,6 @@ setup(
         'dev': ['flake8'],
     },
     entry_points={
-        'console_scripts': ['dir2pdf = dir2pdf'],
+        'console_scripts': ['dir2pdf = dir2pdf:main'],
     }
 )
