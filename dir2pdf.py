@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
 Convert the images in a directory to a PDF.
+
+Exit codes:
+- 1 :: Application error
+- 2 :: Argument error
 """
 import re
 import sys
