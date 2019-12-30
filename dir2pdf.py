@@ -2,7 +2,6 @@
 """
 Convert the images in a directory to a PDF.
 """
-import os
 import re
 import sys
 import warnings
