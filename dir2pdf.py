@@ -16,6 +16,23 @@ from pathlib import Path
 from PIL import Image
 
 
+def configure_warnings(progname):
+    def showwarning(message, category, filename, lineno, file=None, line=None):
+        """Write a warning to a file. Replaces warnings.showwarning.
+        """
+        # Implementation based on warnings.showwarning
+        if file is None:
+            file = sys.stderr
+            if file is None:
+                return  # no stderr in pythonw.exe; warning lost
+        try:
+            file.write(f'{progname}: {category.__name__}: {message}\n')
+        except OSError:
+            pass  # error writing message; warning lost
+
+    warnings.showwarning = showwarning
+
+
 def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
     """Convert the files in the given directory into a PDF
     """
@@ -122,6 +139,8 @@ def main():
     # args are directory, pdf, title, and author
     parser = argparser()
     args = parser.parse_args()
+
+    configure_warnings(parser.prog)
 
     if args.subdirs is not None:
         if '{}' not in str(args.pdf):
