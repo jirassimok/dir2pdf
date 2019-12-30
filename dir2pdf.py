@@ -53,8 +53,10 @@ def subdirs2pdf(basedir_path, pdf_path, subdir_regex,
         match = subdir_regex.match(subdir.name)
 
         if not match:
-            warnings.warn(f'skipping subdir {subdir}:'
-                          ' did not match subdir regex')
+            continue
+        elif not subdir.is_dir():
+            warnings.warn(f'Matching file {subdir} is not a directory;'
+                          ' ignored')
             continue
 
         if 'n' in match.groupdict():
