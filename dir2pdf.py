@@ -86,8 +86,8 @@ def argparser():
     parser.add_argument('--title', '-t', help='A title for the PDF')
     parser.add_argument('--author', help='The author of the document')
 
-    parser.add_argument('--append', help='Append to the PDF instead of writing',
-                        action='store_const', const=True, default=False)
+    parser.add_argument('--append', action='store_true',
+                        help='Append to the PDF instead of writing')
 
     parser.add_argument('--subdirs', '-d', type=Regex, help=(
         "A regexp matching the base name of each subdirectory."))
