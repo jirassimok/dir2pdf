@@ -111,19 +111,19 @@ if __name__ == '__main__':
     parser = argparser()
     args = parser.parse_args()
 
-    if not args.dir.is_dir():
-        sys.exit(f'{args.dir} is not a directory')
-    try:
-        next(args.dir.iterdir())
-    except StopIteration:
-        sys.exit(f'no files in {args.dir}')
-
     if args.subdirs is not None:
         if '{}' not in str(args.pdf):
             parser.error(
                 'if --subdirs is given, PDF must contain format field {}')
     elif not args.append and args.pdf.exists():
         sys.exit(f'{args.pdf} already exists')
+
+    if not args.dir.is_dir():
+        sys.exit(f'{args.dir} is not a directory')
+    try:
+        next(args.dir.iterdir())
+    except StopIteration:
+        sys.exit(f'no files in {args.dir}')
 
     if args.subdirs is None:
         dir2pdf(args.dir, args.pdf, args.title, args.author, args.append)
