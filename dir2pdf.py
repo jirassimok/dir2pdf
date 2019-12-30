@@ -66,6 +66,11 @@ def subdirs2pdf(basedir_path, pdf_path, subdir_regex,
         else:
             n = match.group(0)
 
+        if not n:
+            warnings.warn(f'Empty capturing group for {subdir};'
+                          ' using name instead')
+            n = subdir.name
+
         pdf = Path(str(pdf_path).format(n))
 
         if not append and pdf.exists():
