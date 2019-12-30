@@ -85,11 +85,16 @@ def argparser():
         description='Convert images from a directory into a PDF',
         epilog='''
         If --subdirs is given, a PDF is generated for each subdirectory. The
-        given PDF name is used as a format string, with {} substituted by the
-        named group 'n', if present, or the first capturing group otherwise. If
-        there are no capturing group, the entire match string is used in the
-        name of the PDF. Errors may occur if the format field contains special
-        filename characters.''')
+        given PDF name is used as a format string, with {} replaced by a group
+        from the matched string for each subdirectory.
+
+        The named group 'n' is used if present, or the first capturing group
+        otherwise. If the match has no capturing groups, the entire match
+        string is used. If that value is empty, the name of the subdirectory is
+        used instead.
+
+        The replacement allows a format specification as in Python's str.format
+        function.''')
 
     parser.add_argument('pdf', type=Path, help='The PDF to write')
     parser.add_argument('dir', type=Path, help='The directory to convert')
