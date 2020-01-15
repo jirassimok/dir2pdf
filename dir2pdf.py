@@ -55,7 +55,7 @@ def dir2pdf(dir_path, pdf_path, title=None, author=None, append=False):
 
 
 def remove_transparency(image, filename):
-    if image.mode == 'RGBA':
+    if image.mode in {'RGBA', 'LA', 'PA'}:
         if image.getchannel('A').getextrema() != (255, 255):
             warnings.warn(f"Image '{filename}' contains transparency;"
                           " color will be off")
