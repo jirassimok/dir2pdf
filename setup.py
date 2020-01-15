@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name='dir2pdf',
-    version='0.0.1',
+    version='0.0.3',
     author='Jacob Komissar',
     description='Convert directories of images to PDFs',
     long_description=long_description,
